@@ -6980,11 +6980,11 @@ function showDennis() {
     onR
     $("#dennis").css("display", "flex");
     console.log("Na-Ah-Ah!");
-    var naAhAh = new Audio("/Images/dennis-mock.mp3");
+    var naAhAh = new Audio("./Images/dennis-mock.mp3");
     naAhAh.play();
 
     $("#dennis").append(`
-            <img id="dennis-gif" src="/Images/dennis-crop.gif" />
+            <img id="dennis-gif" src="./Images/dennis-crop.gif" />
         `);
 
     // Wait 1.5 seconds, hide Dennis
