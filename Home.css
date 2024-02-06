@@ -686,17 +686,17 @@ select :hover {
 }
 
 #close-xp {
-    background-image: url("/Images/close.svg");
+    background-image: url("./Images/close.svg");
     background-color: red;
 }
 
     #close-xp:hover {
-        background-image: url("/Images/close-hover.svg");
+        background-image: url("./Images/close-hover.svg");
         /* background-color: purple; */
     }
 
     #close-xp:not(:disabled):active {
-        background-image: url("/Images/close-active.svg");
+        background-image: url("./Images/close-active.svg");
         /* background-color: green; */
     }
 
