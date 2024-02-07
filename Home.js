@@ -289,6 +289,8 @@ Office.onReady(async (info) => {
             var groupPrintDateRefRange = groupPrintDateRefTable.getDataBodyRange().load("values");
             var newMoverBodyRange = newMoversTable.getDataBodyRange().load("values");
 
+
+
             //#endregion -------------------------------------------------------------------------------------------------------------------------
 
             await context.sync();
@@ -777,6 +779,8 @@ Office.onReady(async (info) => {
             $("#reload").on("click", function () {
                 // Hide the message
                 // alert("YES YOU ARE!");
+                //context.runtime.enableEvents = true;
+                //console.log("Events: ON - Occured on Reload!");
                 showMessage(undefined, "hide");
                 location.reload();
             });
@@ -2737,6 +2741,8 @@ async function onTableChanged(eventArgs) {
 
         console.log(eventArgs);
 
+
+
         //#region HANDLE REMOTE CHANGES ------------------------------------------------------------------------------------------------------
 
         console.log("Source of the onTableChanged event: " + eventArgs.source);
@@ -2896,12 +2902,12 @@ async function onTableChanged(eventArgs) {
         var lukeRange = lukeTable.getDataBodyRange().load("values");
         var lukeHeader = lukeTable.getHeaderRowRange().load("values");
 
-        var breBTable = context.workbook.tables.getItem("BreBProjects").load("worksheet");
-        var breBTableName = context.workbook.tables.getItem("BreBProjects").load("name");
-        var breBTableRows = breBTable.rows;
-        breBTableRows.load("items");
-        var breBRange = breBTable.getDataBodyRange().load("values");
-        var breBHeader = breBTable.getHeaderRowRange().load("values");
+        var breTable = context.workbook.tables.getItem("BreProjects").load("worksheet");
+        var breTableName = context.workbook.tables.getItem("BreProjects").load("name");
+        var breTableRows = breTable.rows;
+        breTableRows.load("items");
+        var breRange = breTable.getDataBodyRange().load("values");
+        var breHeader = breTable.getHeaderRowRange().load("values");
 
         var jessicaTable = context.workbook.tables.getItem("JessicaProjects").load("worksheet");
         var jessicaTableName = context.workbook.tables.getItem("JessicaProjects").load("name");
@@ -3897,12 +3903,12 @@ async function onTableChanged(eventArgs) {
                 destinationRows = lukeTableRows.items;
                 destinationTableRange = lukeRange;
                 destinationHeader = lukeHeader;
-            } else if (rowInfo.artist.value == "Bre B.") {
-                destinationTable = breBTable;
-                destinationTableName = breBTableName.name;
-                destinationRows = breBTableRows.items;
-                destinationTableRange = breBRange;
-                destinationHeader = breBHeader;
+            } else if (rowInfo.artist.value == "Bre") {
+                destinationTable = breTable;
+                destinationTableName = breTableName.name;
+                destinationRows = breTableRows.items;
+                destinationTableRange = breRange;
+                destinationHeader = breHeader;
             } else if (rowInfo.artist.value == "Jessica") {
                 destinationTable = jessicaTable;
                 destinationTableName = jessicaTableName.name;
@@ -4299,7 +4305,7 @@ async function onTableChanged(eventArgs) {
                         var sarahRange = sarahTable.getDataBodyRange().load("values");
                         var aliRange = aliTable.getDataBodyRange().load("values");
                         var lukeRange = lukeTable.getDataBodyRange().load("values");
-                        var breBRange = breBTable.getDataBodyRange().load("values");
+                        var breRange = breTable.getDataBodyRange().load("values");
                         var jessicaRange = jessicaTable.getDataBodyRange().load("values");
                         var joshCRange = joshCTable.getDataBodyRange().load("values");
                         var meganRange = meganTable.getDataBodyRange().load("values");
@@ -4336,8 +4342,8 @@ async function onTableChanged(eventArgs) {
                             var destinationStation = aliRange;
                         } else if (rowInfo.artist.value == "Luke") {
                             var destinationStation = lukeRange;
-                        } else if (rowInfo.artist.value == "Bre B.") {
-                            var destinationStation = breBRange;
+                        } else if (rowInfo.artist.value == "Bre") {
+                            var destinationStation = breRange;
                         } else if (rowInfo.artist.value == "Jessica") {
                             var destinationStation = jessicaRange;
                         } else if (rowInfo.artist.value == "Josh C.") {
@@ -4514,7 +4520,7 @@ async function onTableChanged(eventArgs) {
                         var sarahRange = sarahTable.getDataBodyRange().load("values");
                         var aliRange = aliTable.getDataBodyRange().load("values");
                         var lukeRange = lukeTable.getDataBodyRange().load("values");
-                        var breBRange = breBTable.getDataBodyRange().load("values");
+                        var breRange = breTable.getDataBodyRange().load("values");
                         var jessicaRange = jessicaTable.getDataBodyRange().load("values");
                         var joshCRange = joshCTable.getDataBodyRange().load("values");
                         var meganRange = meganTable.getDataBodyRange().load("values");
@@ -4551,8 +4557,8 @@ async function onTableChanged(eventArgs) {
                             var destinationStation = aliRange;
                         } else if (rowInfo.artist.value == "Luke") {
                             var destinationStation = lukeRange;
-                        } else if (rowInfo.artist.value == "Bre B.") {
-                            var destinationStation = breBRange;
+                        } else if (rowInfo.artist.value == "Bre") {
+                            var destinationStation = breRange;
                         } else if (rowInfo.artist.value == "Jessica") {
                             var destinationStation = jessicaRange;
                         } else if (rowInfo.artist.value == "Josh C.") {
@@ -4782,6 +4788,8 @@ async function onTableChanged(eventArgs) {
         if (dennisHere == true) { //if row was inserted illegally, do not return error
             return;
         };
+        //context.runtime.enableEvents = false;
+        //console.log("Events: OFF - Occured in onTableChanged!");
         console.log(err) // <--- does this log?
         showMessage(err, "show");
         context.runtime.enableEvents = true;
@@ -4929,7 +4937,13 @@ async function registerOnActivateHandler() {
 
         for (var y = 0; y < worksheetTablesCount; y++) {
             var bonTable = worksheetTables.getItemAt(y);
-            console.log("Attaching the onTableChanged to", bonTable)
+            removeEvents = bonTable.onChanged.removeAll()
+
+            await context.sync()
+
+            console.log("All event handlers for bonTable were removed");
+
+            console.log("Attaching the onTableChanged to", bonTable);
             changeEvent = bonTable.onChanged.add(onTableChanged);
 
             selectionEvent = bonTable.onSelectionChanged.add(onTableSelectionChangedEvents);
