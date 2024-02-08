@@ -174,6 +174,7 @@ var previousInfo = {
 };
 
 var isOnline = false;
+var enableEvents;
 
 // var productGroupPrintTrigger;
 
@@ -250,6 +251,10 @@ Office.onReady(async (info) => {
             //     console.log(`Autosave should now be turned on`)
             // };
 
+
+            enableEvents = context.runtime.load("enableEvents");
+
+            await context.sync();
 
 
 
@@ -2730,7 +2735,16 @@ async function onTableSelectionChangedEvents(eventArgs) {
  * @param {Object} eventArgs The event arguments, which are details about the event that was triggered
  */
 async function onTableChanged(eventArgs) {
+
+/*    enableEvents = false;*/
+
     console.log("On Table Change Fired");
+
+    if (!eventArgs.details) {
+        console.log("Returning since eventArg details are empty...");
+        return;
+    };
+
     await Excel.run(async (context) => {
 
         var autoSave = context.workbook.load("autoSave");
@@ -2896,12 +2910,12 @@ async function onTableChanged(eventArgs) {
         var lukeRange = lukeTable.getDataBodyRange().load("values");
         var lukeHeader = lukeTable.getHeaderRowRange().load("values");
 
-        var breBTable = context.workbook.tables.getItem("BreBProjects").load("worksheet");
-        var breBTableName = context.workbook.tables.getItem("BreBProjects").load("name");
-        var breBTableRows = breBTable.rows;
-        breBTableRows.load("items");
-        var breBRange = breBTable.getDataBodyRange().load("values");
-        var breBHeader = breBTable.getHeaderRowRange().load("values");
+        var breTable = context.workbook.tables.getItem("BreProjects").load("worksheet");
+        var breTableName = context.workbook.tables.getItem("BreProjects").load("name");
+        var breTableRows = breTable.rows;
+        breTableRows.load("items");
+        var breRange = breTable.getDataBodyRange().load("values");
+        var breHeader = breTable.getHeaderRowRange().load("values");
 
         var jessicaTable = context.workbook.tables.getItem("JessicaProjects").load("worksheet");
         var jessicaTableName = context.workbook.tables.getItem("JessicaProjects").load("name");
@@ -3897,12 +3911,12 @@ async function onTableChanged(eventArgs) {
                 destinationRows = lukeTableRows.items;
                 destinationTableRange = lukeRange;
                 destinationHeader = lukeHeader;
-            } else if (rowInfo.artist.value == "Bre B.") {
-                destinationTable = breBTable;
-                destinationTableName = breBTableName.name;
-                destinationRows = breBTableRows.items;
-                destinationTableRange = breBRange;
-                destinationHeader = breBHeader;
+            } else if (rowInfo.artist.value == "Bre") {
+                destinationTable = breTable;
+                destinationTableName = breTableName.name;
+                destinationRows = breTableRows.items;
+                destinationTableRange = breRange;
+                destinationHeader = breHeader;
             } else if (rowInfo.artist.value == "Jessica") {
                 destinationTable = jessicaTable;
                 destinationTableName = jessicaTableName.name;
@@ -4299,7 +4313,7 @@ async function onTableChanged(eventArgs) {
                         var sarahRange = sarahTable.getDataBodyRange().load("values");
                         var aliRange = aliTable.getDataBodyRange().load("values");
                         var lukeRange = lukeTable.getDataBodyRange().load("values");
-                        var breBRange = breBTable.getDataBodyRange().load("values");
+                        var breRange = breTable.getDataBodyRange().load("values");
                         var jessicaRange = jessicaTable.getDataBodyRange().load("values");
                         var joshCRange = joshCTable.getDataBodyRange().load("values");
                         var meganRange = meganTable.getDataBodyRange().load("values");
@@ -4336,8 +4350,8 @@ async function onTableChanged(eventArgs) {
                             var destinationStation = aliRange;
                         } else if (rowInfo.artist.value == "Luke") {
                             var destinationStation = lukeRange;
-                        } else if (rowInfo.artist.value == "Bre B.") {
-                            var destinationStation = breBRange;
+                        } else if (rowInfo.artist.value == "Bre") {
+                            var destinationStation = breRange;
                         } else if (rowInfo.artist.value == "Jessica") {
                             var destinationStation = jessicaRange;
                         } else if (rowInfo.artist.value == "Josh C.") {
@@ -4514,7 +4528,7 @@ async function onTableChanged(eventArgs) {
                         var sarahRange = sarahTable.getDataBodyRange().load("values");
                         var aliRange = aliTable.getDataBodyRange().load("values");
                         var lukeRange = lukeTable.getDataBodyRange().load("values");
-                        var breBRange = breBTable.getDataBodyRange().load("values");
+                        var breRange = breTable.getDataBodyRange().load("values");
                         var jessicaRange = jessicaTable.getDataBodyRange().load("values");
                         var joshCRange = joshCTable.getDataBodyRange().load("values");
                         var meganRange = meganTable.getDataBodyRange().load("values");
@@ -4551,8 +4565,8 @@ async function onTableChanged(eventArgs) {
                             var destinationStation = aliRange;
                         } else if (rowInfo.artist.value == "Luke") {
                             var destinationStation = lukeRange;
-                        } else if (rowInfo.artist.value == "Bre B.") {
-                            var destinationStation = breBRange;
+                        } else if (rowInfo.artist.value == "Bre") {
+                            var destinationStation = breRange;
                         } else if (rowInfo.artist.value == "Jessica") {
                             var destinationStation = jessicaRange;
                         } else if (rowInfo.artist.value == "Josh C.") {
