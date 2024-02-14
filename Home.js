@@ -134,7 +134,8 @@ var groupRefData = {};
 var newMoverData = {};
 var newMoverGroupData = {};
 var loop = true;
-var changeEvent;
+var activeChangeEvent;
+var completedChangeEvent;
 var selectionEvent;
 var snailPoop = {};
 var designManagersData = {};
@@ -2736,14 +2737,22 @@ async function onTableSelectionChangedEvents(eventArgs) {
  */
 async function onTableChanged(eventArgs) {
 
-/*    enableEvents = false;*/
+    /*    enableEvents = false;*/
 
     console.log("On Table Change Fired");
 
-    if (!eventArgs.details) {
-        console.log("Returning since eventArg details are empty...");
-        return;
+    try {
+        await removeChangeEvent();
+        console.log("Successfully removed events!");
+    } catch (error) {
+        console.log("Broke while trying to remove events...see error below:");
+        console.log(error);
     };
+
+    //if (!eventArgs.details) {
+    //    console.log("Returning since eventArg details are empty...");
+    //    return;
+    //};
 
     await Excel.run(async (context) => {
 
@@ -4792,6 +4801,32 @@ async function onTableChanged(eventArgs) {
         eventsOn(); //turns events back on
         console.log("Events: ON  →  turned on at the end of the onTableChanged Function!");
 
+        //if (changedWorksheet.name == "Unassigned Projects") {
+
+        //    var theWorksheetTables = worksheetTables.getItemAt(0);
+        //    console.log("Attaching the onTableChanged to", theWorksheetTables)
+        //    activeChangeEvent = theWorksheetTables.onChanged.add(onTableChanged);
+
+        //} else {
+
+        var theWorksheetTables = worksheetTables.getItemAt(0);
+        console.log("Attaching the onTableChanged to", theWorksheetTables)
+        activeChangeEvent = theWorksheetTables.onChanged.add(onTableChanged);
+
+        if (completedTable) {
+            var theCompletedTables = worksheetTables.getItemAt(1);
+            console.log("Attaching the onTableChanged to", theCompletedTables)
+            completedChangeEvent = theCompletedTables.onChanged.add(onTableChanged);
+        };
+
+    
+
+        /*  };*/
+
+
+
+
+
     }).catch(err => { //error catcher
         if (dennisHere == true) { //if row was inserted illegally, do not return error
             return;
@@ -4829,7 +4864,7 @@ async function registerOnActivateHandler() {
         var activeSheet = context.workbook.worksheets.getActiveWorksheet().load("worksheetId");
         activeSheet.load("name");
 
-        context.runtime.load("enableEvents");
+        //context.runtime.load("enableEvents");
 
         var theAllTable = context.workbook.tables.load("count"); //all of the tables in the workbook
         theAllTable.load("items");
@@ -4839,8 +4874,8 @@ async function registerOnActivateHandler() {
 
         await context.sync();
 
-        context.runtime.enableEvents = false;
-        console.log("Events: OFF - Occured in registerOnActivateHandler");
+        //context.runtime.enableEvents = false;
+        //console.log("Events: OFF - Occured in registerOnActivateHandler");
 
         var activeSheetName = activeSheet.name;
 
@@ -4941,10 +4976,27 @@ async function registerOnActivateHandler() {
             };
         };
 
-        for (var y = 0; y < worksheetTablesCount; y++) {
-            var bonTable = worksheetTables.getItemAt(y);
+        var bonTable;
+
+        if (activeSheet.name == "Unassigned Projects") {
+            bonTable = worksheetTables.getItemAt(0);
             console.log("Attaching the onTableChanged to", bonTable)
-            changeEvent = bonTable.onChanged.add(onTableChanged);
+            activeChangeEvent = bonTable.onChanged.add(onTableChanged);
+        } else {
+
+            bonTable = worksheetTables.getItemAt(0);
+            console.log("Attaching the onTableChanged to", bonTable)
+            activeChangeEvent = bonTable.onChanged.add(onTableChanged);
+
+            var completedBonTable = worksheetTables.getItemAt(1);
+            console.log("Attaching the onTableChanged to", completedBonTable)
+            completedChangeEvent = completedBonTable.onChanged.add(onTableChanged);
+
+        }
+
+
+        for (var y = 0; y < worksheetTablesCount; y++) {
+
 
             selectionEvent = bonTable.onSelectionChanged.add(onTableSelectionChangedEvents);
 
@@ -5115,14 +5167,27 @@ async function removeSelectionEvent() {
 };
 
 async function removeChangeEvent() {
-    await Excel.run(changeEvent.context, async (context) => {
-        changeEvent.remove();
+    await Excel.run(activeChangeEvent.context, async (context) => {
+        activeChangeEvent.remove();
 
         await context.sync();
 
-        changeEvent = null;
-        // console.log("Change Event was removed");
+        activeChangeEvent = null;
+        console.log("Active Change Event was removed");
     });
+
+    if (completedChangeEvent) {
+
+        await Excel.run(completedChangeEvent.context, async (context) => {
+            completedChangeEvent.remove();
+
+            await context.sync();
+
+            completedChangeEvent = null;
+            console.log("Completed Change Event was removed");
+        });
+    };
+
 };
 
 //#endregion ---------------------------------------------------------------------------------------------------------------------------------
@@ -7370,3 +7435,6 @@ async function writeAndRedo(newPrintDate, newGroup) {
     });
 
 };
+
+
+
